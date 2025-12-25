@@ -1,7 +1,6 @@
 """Type definitions for Farnell MCP server."""
 
-from typing import TypedDict, NotRequired
-
+from typing import NotRequired, TypedDict
 
 # ============================================================================
 # Product Search Types

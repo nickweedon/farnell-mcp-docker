@@ -3,7 +3,6 @@
 Tests the server initialization and tool registration.
 """
 
-import pytest
 
 from farnell_mcp.server import mcp
 

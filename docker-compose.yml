@@ -3,6 +3,10 @@ services:
     build:
       context: .
       target: production
+    image: farnell-mcp:latest
+    container_name: farnell-mcp-server
+    stdin_open: true
+    tty: true      
     env_file:
       - .env
     ports:

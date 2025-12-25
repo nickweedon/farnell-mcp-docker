@@ -18,8 +18,8 @@ from typing import Any
 
 from fastmcp import FastMCP
 
+from .api import orders, products
 from .client import get_farnell_config
-from .api import products, orders
 
 # Configure logging
 logging.basicConfig(

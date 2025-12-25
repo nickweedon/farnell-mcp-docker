@@ -6,7 +6,6 @@ This module implements MCP tools for searching the Farnell Electronics catalog.
 from typing import Any
 
 from ..client import get_product_client
-from ..types import Product, ProductSearchResult
 
 
 async def search_products_by_keyword(

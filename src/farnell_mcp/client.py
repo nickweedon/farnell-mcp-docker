@@ -16,8 +16,6 @@ from typing import Any
 import requests
 from dotenv import load_dotenv
 
-from .types import FarnellConfigDict
-
 # Load environment variables from multiple possible locations
 _env_paths = [
     Path.cwd() / ".env",
