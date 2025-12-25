@@ -82,6 +82,35 @@ Your Farnell API key should be kept secure:
 - For production deployment, use environment variables or secrets management
 - Get your API key from [partner.element14.com](https://partner.element14.com)
 
+### API Rate Limits
+
+The Farnell Partner API has the following rate limits for the **Basic** tier:
+- **2 calls per second**
+- **1,000 calls per day**
+
+Exceeding these limits may result in:
+- API requests being throttled or rejected
+- Temporary suspension of API access
+- Account termination for repeat violations
+
+**Implementation:**
+
+This server automatically implements rate limiting for the per-second limit:
+- **2 calls/second** (matches API limit, bucket size=2 to prevent bursts)
+- **Per-day limit**: Not enforced locally - upstream API will return errors if exceeded
+
+Rate limiting is implemented using the `pyrate-limiter` library with a token bucket algorithm. When the rate limit is reached, requests are automatically delayed (not rejected) until a token becomes available. This ensures compliance with the per-second limit while providing a seamless user experience.
+
+The per-second limit uses a small bucket size (2 tokens) to enforce steady rate limiting rather than allowing large bursts. This means you can make 2 calls immediately, then subsequent calls are limited to approximately 2 per second.
+
+**Technical Details:**
+- Library: `pyrate-limiter>=3.0.0`
+- Algorithm: Token bucket with leaky bucket behavior
+- Per-second limit: `Rate(2, Duration.SECOND)` - bucket size 2, replenishes at 2 tokens/sec
+- Per-day limit: Handled by upstream API (will return HTTP errors if exceeded)
+- Behavior: Requests block/delay automatically for per-second limit, no exceptions thrown
+- Max delay: 1 hour (effectively indefinite for normal usage patterns)
+
 ## Store Selection
 
 The server supports multiple regional stores via `FARNELL_STORE_ID`:

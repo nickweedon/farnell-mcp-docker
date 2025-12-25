@@ -79,6 +79,26 @@ uv run farnell-mcp
 - `sg.element14.com` - Element14 Singapore
 - `hk.element14.com` - Element14 Hong Kong
 
+### API Rate Limits
+
+The Farnell Partner API enforces the following rate limits for the **Basic** tier:
+
+- **2 calls per second**
+- **1,000 calls per day**
+
+**Automatic Rate Limiting:**
+
+This MCP server automatically handles the per-second rate limit for you:
+- **Per-second limit**: 2 calls/second (with small bucket to prevent bursts)
+- **Per-day limit**: Monitored by Farnell API (will return errors if exceeded)
+- **Behavior**: Requests are automatically delayed when per-second limit is reached (not rejected)
+- **No configuration required** - works out of the box
+
+When you exceed the 2 calls/second limit, the server will pause your request until a token becomes available. The first 2 requests can execute immediately, then subsequent requests are limited to approximately 2 per second. If you hit the 1,000 calls/day limit, the Farnell API will return an error response.
+
+**Important Notes:**
+- Contact [Farnell Partner Support](https://partner.element14.com/contact) to discuss higher tier options if you need increased limits
+
 ## Available Tools
 
 ### Product Search

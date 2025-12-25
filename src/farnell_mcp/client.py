@@ -15,6 +15,7 @@ from typing import Any
 
 import requests
 from dotenv import load_dotenv
+from pyrate_limiter import Duration, Limiter, Rate
 
 # Load environment variables from multiple possible locations
 _env_paths = [
@@ -101,6 +102,8 @@ class ProductSearchClient:
 
     Uses simple API key authentication via query parameters.
     Works in both production and sandbox environments.
+    Implements automatic rate limiting:
+    - 2 calls/second (matches API limit with small bucket to prevent bursts)
     """
 
     def __init__(self, config: FarnellConfig) -> None:
@@ -114,9 +117,19 @@ class ProductSearchClient:
         self.session = requests.Session()
         self.session.headers["Content-Type"] = "application/json"
 
+        # Initialize rate limiter for per-second limit
+        # API limit: 2 calls/sec (per-day limit handled by upstream API)
+        # Small bucket size (2) prevents bursts while allowing 2 immediate calls
+        self.rate_limiter = Limiter(
+            Rate(2, Duration.SECOND),  # 2 calls per second (bucket size = 2)
+            raise_when_fail=False,  # Don't raise exception when rate limit hit
+            max_delay=Duration.HOUR,  # Wait up to 1 hour for a token (effectively indefinite)
+        )
+
         if config.debug:
             logging.basicConfig(level=logging.DEBUG)
             logger.debug("ProductSearchClient initialized with store_id=%s", config.store_id)
+            logger.debug("Rate limiting enabled: 2 calls/sec (bucket=2)")
 
     def search_by_keyword(
         self,
@@ -237,6 +250,9 @@ class ProductSearchClient:
     def _make_request(self, params: dict[str, Any]) -> dict[str, Any]:
         """Make a request to the Product Search API.
 
+        Rate limiting is applied automatically - the request will be delayed
+        if necessary to stay within the 2 calls/sec limit.
+
         Args:
             params: Request parameters.
 
@@ -248,6 +264,10 @@ class ProductSearchClient:
         """
         if self.config.debug:
             logger.debug("Making request to %s with params: %s", self.base_url, params)
+
+        # Acquire rate limit - this will block/delay if we're over the limit
+        # Per-second limit only; per-day limit is enforced by upstream API
+        self.rate_limiter.try_acquire("farnell_api")
 
         try:
             response = self.session.get(self.base_url, params=params, timeout=self.config.timeout)

@@ -23,6 +23,7 @@ dependencies = [
     "fastmcp>=2.0.0",
     "requests>=2.31.0",
     "python-dotenv>=1.0.0",
+    "pyrate-limiter>=3.0.0",
 ]
 
 [project.optional-dependencies]
