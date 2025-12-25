@@ -1,0 +1,15 @@
+services:
+  devcontainer:
+    build:
+      context: .
+      target: development
+    env_file:
+      - .env
+    volumes:
+      - .:/app:cached
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "8000:8000"
+    stdin_open: true
+    tty: true
+    command: sleep infinity

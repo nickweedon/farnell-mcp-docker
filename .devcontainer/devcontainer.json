@@ -1,0 +1,27 @@
+{
+    "name": "Skeleton MCP Development",
+    "dockerComposeFile": "../docker-compose.devcontainer.yml",
+    "service": "devcontainer",
+    "workspaceFolder": "/app",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "ms-python.debugpy",
+                "charliermarsh.ruff",
+                "anthropics.claude-code"
+            ],
+            "settings": {
+                "python.defaultInterpreterPath": "/app/.venv/bin/python",
+                "python.analysis.typeCheckingMode": "basic",
+                "editor.formatOnSave": true,
+                "[python]": {
+                    "editor.defaultFormatter": "charliermarsh.ruff"
+                }
+            }
+        }
+    },
+    "postCreateCommand": "uv sync",
+    "remoteUser": "root"
+}
